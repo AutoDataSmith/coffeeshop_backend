@@ -3,8 +3,10 @@ require('dotenv').config();  // This will Load .env variables into process.env
 const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
+const appName = process.env.APPNAME || 'Titan Coffee Shop API';
 
 const apiRoutes = require('./routes/orders'); 
+const { connectWithRetry, isConnected } = require('./db/connection');
 
 // Middleware for JSON parsing
 app.use(express.json());
@@ -14,7 +16,16 @@ app.use('/api', apiRoutes);
 
 // Home - Root route
 app.get('/', (req, res) => {
-  res.send('Welcome to Titan Coffee Shop API!');
+  res.send(`Welcome to ${appName}!`);
+});
+
+// Health check api endpoint - NOTE: This could be added to the routes folder
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    database: isConnected() ? 'Connected' : 'Disconnected'
+  });
 });
 
 // 404 Error handling
@@ -33,11 +44,52 @@ app.use((err, req, res, next) => {
 
 });
 
-// Start server
-app.listen(port, () => {
+// This is called in the initializeApp to actually start the server
+const startServer = () => {
+  app.listen(port, () => {
 
-  // outputs the current environment deployment and server status to the console
-  console.log(`The current deployment environment is set to: ${process.env.NODE_ENV}`); 
-  console.log(`The Titan Coffe Shop API Server is now running at http://localhost:${port}`);
-  
-});
+    // outputs the current environment deployment and server status to the console
+    console.log(`The current deployment environment is set to: ${process.env.NODE_ENV}`); 
+    console.log(`The ${appName} Server is now running at http://localhost:${port}`);
+    console.log(`📊 Health check: http://localhost:${port}/api/health`);
+
+  });
+};
+
+// Initialize database and start server
+const initializeApp = async () => {
+  try {
+    await connectWithRetry();  // This makes attempts to connect to the database
+
+    // Explicitly verify connection state (defensive check)
+    let connectionReady = isConnected();
+    let readyAttempts = 0;
+    const maxReadyChecks = 5; // Poll up to 5 times (1s total)
+    
+    // This loops to make sure there is a successful connection before proceeding on to other initialization steps that require a connection 
+    while (!connectionReady && readyAttempts < maxReadyChecks) {
+      console.log(`Waiting for full DB readiness... (attempt ${readyAttempts + 1}/${maxReadyChecks})`);
+      await new Promise(resolve => setTimeout(resolve, 200)); // 200ms delay
+      connectionReady = isConnected();
+      readyAttempts++;
+    }
+    
+    if (!connectionReady) {
+      throw new Error('MongoDB connection not ready after verification attempts');
+    }
+    
+    console.log('MongoDB connection verified - proceeding with initialization');
+
+    const { initializeProducts } = require('./productManager');
+    await initializeProducts(); // This makes sure there an initial products in the DB
+    
+    startServer();  
+
+  } catch (error) {
+    console.error(`Failed to initialize the ${appName} application:`, error);
+    process.exit(1);
+  }
+};
+
+// Start the backend API application
+initializeApp();

@@ -8,13 +8,13 @@ const { getProducts, getProductByCode } = require('../productManager');
 // destructuring assignment: function references from orderManager Module - only provide the functions that are needed for the assignment
 const { getOrders, addOrder, Order } = require('../orderManager');
 
-// GET /api/products
-router.get('/products', (req, res, next) => {
+// GET /api/products - using async
+router.get('/products', async (req, res, next) => {
   try {
-    const products = getProducts();
+    const products = await getProducts();  // must await the asyncronous call
     res.json(products);
   } catch (error) {
-    next(error);
+    next(error); // Pass to Express error handler
   }
 });
 
@@ -24,7 +24,7 @@ router.get('/orders', (req, res, next) => {
     const orders = getOrders();
     res.json(orders);
   } catch (error) {
-    next(error);
+    next(error); // Pass to Express error handler
   }
 });
 
@@ -95,7 +95,7 @@ router.post('/orders', (req, res, next) => {
     });
     
   } catch (error) {
-    next(error);
+    next(error); // Pass to Express error handler
   }
 
 });

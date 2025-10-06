@@ -34,3 +34,7 @@ I have attached these files separately for reference.
 Please keep the instructions clear but in a concise format.
 
 ```
+**<span style="color:green">Results:</span>** [Prompt 3 results](AI_Prompt3_results.md)
+
+**<span style="color:green">Reflection:</span>** I was disappointed with this approach as the AI response gave examples where the Product and order class were rewriteen to be tightly coupled with mongoDB and mongoose. This VIOLATES separation of concerns
+  
