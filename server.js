@@ -35,6 +35,9 @@ app.use((err, req, res, next) => {
 
 // Start server
 app.listen(port, () => {
-  console.log(process.env.NODE_ENV); // outputs the current environment to the console
+
+  // outputs the current environment deployment and server status to the console
+  console.log(`The current deployment environment is set to: ${process.env.NODE_ENV}`); 
   console.log(`The Titan Coffe Shop API Server is now running at http://localhost:${port}`);
+  
 });

@@ -36,7 +36,6 @@ function getProductByCode(productCode) {
   return products.find(product => product.productCode === productCode) || null;
 }
 
-// EXTRA Functions - These were added for later use and not part of this assignment
 
 function addProduct(productCode, name, price, category) {
   const product = new Product(productCode, name, price, category);

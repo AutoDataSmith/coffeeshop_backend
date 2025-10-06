@@ -34,7 +34,7 @@ function addOrder(date, product, size, quantity) {
   return order;
 }
 
-// EXTRA Function - This was added for later use and not part of this assignment
+
 function removeOrder(index) {
   if (index >= 0 && index < orders.length) {
     return orders.splice(index, 1)[0];
