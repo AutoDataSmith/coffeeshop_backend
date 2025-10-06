@@ -1,0 +1,23 @@
+{
+  "name": "titan-coffee-shop",
+  "version": "1.0.0",
+  "description": "A Node.js backend for Titan Coffee Shop project",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "node",
+    "backend",
+    "coffee",
+    "shop",
+    "titan",
+    "bakery"
+  ],
+  "author": "Ken Smith - SPC Student 2555867",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
