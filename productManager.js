@@ -2,11 +2,11 @@ const mongoose = require('mongoose');
 
 // Product Schema
 const productSchema = new mongoose.Schema({
-  productCode: { type: String, required: true, unique: true },
+  productCode: { type: String, required: true, unique: true },  // unique makes sure that only 1 productCode can be in the collection
   name: { type: String, required: true },
   price: { type: Number, required: true, min: 0 },
   category: { type: String, required: true, enum: ['beverage', 'pantry', 'bakery', 'snacks', 'merch'] }
-}, { timestamps: true });
+}, { timestamps: true }); // the timestamps directive adds created and updated timestamps to the database
 
 // Product Model
 const Product = mongoose.model('Product', productSchema);
@@ -61,14 +61,6 @@ const getProductByCode = async (productCode) => {
     throw error;
   }
 };
-const getProductCount = async () => {
-  try {
-    return await Product.countDocuments();
-  } catch (error) {
-    console.error('Error fetching product count:', error);
-    throw error;
-  }
-};
 
 const addProduct = async (productCode, name, price, category) => {
   try {
@@ -84,7 +76,8 @@ const addProduct = async (productCode, name, price, category) => {
   }
 };
 
-const saveProduct = async (id, name, price, category) => {
+// Updates a product by mongoDB-assigned id (returns an updated object or null)
+const updateProduct = async (id, name, price, category) => {
   try {
     return await Product.findByIdAndUpdate(
       id,
@@ -97,6 +90,8 @@ const saveProduct = async (id, name, price, category) => {
   }
 };
 
+
+// removes a product by mongoDB-assigned id (returns a deleted object or null)
 const removeProduct = async (id) => {
   try {
     return await Product.findByIdAndDelete(id);
@@ -106,13 +101,13 @@ const removeProduct = async (id) => {
   }
 };
 
+
 module.exports = {
   Product,
   getProducts,
   getProductByCode,
-  getProductCount,
   addProduct,
-  saveProduct,
+  updateProduct,  
   removeProduct,
   initializeProducts
 };
