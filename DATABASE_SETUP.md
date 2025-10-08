@@ -2,6 +2,10 @@
 The database for this project uses a hosted mongoDB Atlas
 - To add a mongoDB database connection to this project, You will need to add a .env file to add in the proper variables
 - There is a .env.example file that lists each of the variables needed
+
+Screenshot of Health Monitor endpoint:
+- [POSTMAN Health GET](POSTMAN_GET_Health.png)
+
 ```
 MONGODB_URI=
 # this needs to be your connection string to your mongDB instance or hosted platform

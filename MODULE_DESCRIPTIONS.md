@@ -1,4 +1,4 @@
-## commection module
+## Connection module
 db/connection.js
 
 The connection module handles all the connection needs for mongoDB and the mongoose ORM
@@ -40,3 +40,21 @@ TO do this, there is a mongoose schema added specifically to handle the "snapsho
 I decided to break out products and order routing separately and each have almost identical API signatures.
 - GET, POST, PUT, DELETE 
 - almost all of the validation is performed in the routing, but down the road this should be moved to a behavior/buiness logic layer insead of clogging up the routes
+
+## Testing
+ Screenshots of the results of each of the orders API endpoints
+
+- [POSTMAN Orders GET](POSTMAN_GET_Orders.png)
+- [POSTMAN Orders POST](POSTMAN_POST_Orders.png)
+- [POSTMAN Orders PUT](POSTMAN_PUT_Orders.png)
+- [POSTMAN Orders DELETE](POSTMAN_DELETE_Orders.png)
+
+Screenshots of the results of each of the products API endpoints
+
+- [POSTMAN Products GET](POSTMAN_GET_Products.png)
+- [POSTMAN Products POST](POSTMAN_POST_Products.png)
+- [POSTMAN Products PUT](POSTMAN_PUT_Products.png)
+-  [POSTMAN Products DELETE](POSTMAN_DELETE_Products.png)
+
+Screenshot of Health Monitor endpoint:
+- [POSTMAN Health GET](POSTMAN_GET_Health.png)

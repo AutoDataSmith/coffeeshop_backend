@@ -30,7 +30,7 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// badmath - route to generate a 500 Error
+// badmath - route to generate a 500 Error - only for testng purposes
 app.get('/badmath', (req, res) => {
   throw('tried to process some bad Math ');
 });

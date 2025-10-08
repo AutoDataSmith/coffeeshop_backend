@@ -69,7 +69,7 @@ sample post data: - This should return a saved order
 // sample post data: - Indexes 2,3, and 4 should fail validation bad quantity, Bad Code, and bad size
 ```json
 [
-    {"productCode":"DBT01","size":"small","quantity":1},
+    {"productCode":"CCO01","size":"large","quantity":10},
     {"productCode":"TRM01","size":"small","quantity":3},
     {"productCode":"LAT01","size":"small","quantity":0},   
     {"productCode":"xxz01","size":"small","quantity":1},
