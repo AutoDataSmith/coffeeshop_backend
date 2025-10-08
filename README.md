@@ -4,6 +4,8 @@ The coffeeshop_backend API can be tested with the POSTMAN application.
 ## Deployment and Configuration
 Set up a hosting account using Render
 
+[RENDER INSTRUCTIONS](AI_Prompt_results_Render.md)
+
 ## The Products API
 
 Test 1: GET https://coffeeshop-backend-4qlh.onrender.com/api/products
@@ -32,7 +34,18 @@ sample post data:  only index 1 is valid - index 0, 2, 3 should return a specifi
 ]
 ```
 
-Test 3: DELETE https://coffeeshop-backend-4qlh.onrender.com/api/products/PRODUCTCODE
+Test 3: PUT https://coffeeshop-backend-4qlh.onrender.com/api/products/PRODUCTCODE
+- Example: PUT https://coffeeshop-backend-4qlh.onrender.com/api/products/TRM01
+- must provide a PRODUCTCODE in the url
+- Updates the product with the given PRODUCTCODE and new values in the data 
+- returns the updated product object
+
+sample put data: 
+```json    
+    { "name": "Roasted Almonds", "price": 7.99, "category": "snacks" } 
+```
+
+Test 4: DELETE https://coffeeshop-backend-4qlh.onrender.com/api/products/PRODUCTCODE
 
 - Example: DELETE https://coffeeshop-backend-4qlh.onrender.com/api/products/TRM01
 - must provide a product code in the url
@@ -67,6 +80,19 @@ sample post data: - This should return a saved order
 Test 2: GET https://coffeeshop-backend-4qlh.onrender.com/api/orders
 -  Returns the list of all orders
 
-Test 3: DELETE https://coffeeshop-backend-4qlh.onrender.com/api/orders/
--  Returns the list of all orders
+Test 3: PUT https://coffeeshop-backend-4qlh.onrender.com/api/products/ID
+- Example: PUT https://coffeeshop-backend-4qlh.onrender.com/api/orders/68e5f4e0eef48419e39fa4a5
+- must provide a mongoDB ID of the order in the url
+- Updates the order with the given mongoDB ID and new values in the data 
+- returns the updated order object
 
+sample put data: 
+```json    
+    {"size":"small","quantity":1 } 
+```
+
+Test 4: DELETE https://coffeeshop-backend-4qlh.onrender.com/api/orders/ID
+- Example: DELETE https://coffeeshop-backend-4qlh.onrender.com/api/orders/68e5f4e0eef48419e39fa4a5
+- must provide a mongoDB ID of the order in the url
+- deletes 1 order with the given mongoDB ID
+- returns the deleted Order object

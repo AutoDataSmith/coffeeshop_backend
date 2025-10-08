@@ -49,7 +49,7 @@ const addOrder = async (date, productCode, size, quantity) => {
   try {
     const product = await getProductByCode(productCode);
     if (!product) {
-      throw new Error(`Product with ID ${productId} not found`);
+      throw new Error(`Product with productCode ${productCode} not found`);
     }
 
   // Create order with embedded snapshot
@@ -74,6 +74,21 @@ const addOrder = async (date, productCode, size, quantity) => {
   }
 };
 
+// Updates an order by the mongoDB-assigned id (returns an updated object or null)
+const updateOrder = async (id, size, quantity) => {
+  try {
+    return await Order.findByIdAndUpdate(
+      id,
+      {size, quantity },
+      { new: true, runValidators: true }
+    );
+  } catch (error) {
+    console.error('Error updating order:', error);
+    throw error;
+  }
+};
+
+// removes an order by the mongoDB-assigned id (returns a deleted object or null)
 const removeOrder = async (id) => {
   try {
     return await Order.findByIdAndDelete(id);
@@ -83,4 +98,4 @@ const removeOrder = async (id) => {
   }
 };
 
-module.exports = { Order, getOrders, addOrder, removeOrder };
+module.exports = { Order, getOrders, addOrder, updateOrder, removeOrder };
