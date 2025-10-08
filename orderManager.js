@@ -1,46 +1,86 @@
-// Since I broke out the Product to it's own class, It needs to be imported here to use it to build orders
-// uses a destructuring assignment - only uses the exported Product 
-const { Product } = require('./productManager');
+const mongoose = require('mongoose');
+const { Product, getProductByCode } = require('./productManager');
 
-// TODO: Refactoring 
-// 1) - size is an issue. there is a difference between the prices for small, medium and large.
-//   Also, this may not apply to other products - Size should be moved to the product class
-// 2) - The current Order class does not lump orders in a logical way. example: Customer A, B and C may have multiple orders
-//      Current Order class should be renamed OrderItem
-//      Another class should be added called Order with properties like: id, date, cashierid, status, orderItems
+// Embedded Product Snapshot Schema fron a selected productCode  
+const productSnapshotSchema = new mongoose.Schema({
+  productCode: { type: String, required: true },
+  name: { type: String, required: true },
+  price: { type: Number, required: true, min: 0 },
+  category: { type: String, required: true }
+}, { _id: false }); // No _id for embedded doc
 
-// Order class
-class Order {
-  constructor(date, product, size, quantity) {
-    this.date = date;
-    this.product = product; // Product object
-    this.size = size; // 'small', 'medium', 'large'
-    this.quantity = quantity;
+// Order Schema
+const orderSchema = new mongoose.Schema({
+  date: { type: Date, default: Date.now },
+  product: { 
+    type: productSnapshotSchema,  // This is the snapshot schema of a selected productCode  
+    required: true 
+  },
+  size: { 
+    type: String, 
+    required: true, 
+    enum: ['small', 'medium', 'large'] 
+  },
+  quantity: { 
+    type: Number, 
+    required: true, 
+    min: 1 
   }
-}
+}, { timestamps: true });  // the timestamps directive adds created and updated timestamps to the database
+
+// Order Model
+const Order = mongoose.model('Order', orderSchema);
 
 const orders = [];
 
-// returns the orders array
-function getOrders() {  
-  return orders;
-}
-// Add one Order to the orders array
-function addOrder(date, product, size, quantity) {
-  //TODO:  Need to deal with duplicates, but this is a much bigger issue and should be dealt with during a factoring pass
-
-  const order = new Order(date, product, size, quantity);
-  orders.push(order);
-  return order;
-}
-
-
-function removeOrder(index) {
-  if (index >= 0 && index < orders.length) {
-    return orders.splice(index, 1)[0];
+// returns all orders from database - using async
+const getOrders = async () => {
+  try {
+    return await Order.find({})      
+      .sort({ date: -1 })
+      .lean(); // Raw objects for performance
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    throw error;
   }
-  return null;
-}
+};
 
-// Export
+const addOrder = async (date, productCode, size, quantity) => {
+  try {
+    const product = await getProductByCode(productCode);
+    if (!product) {
+      throw new Error(`Product with ID ${productId} not found`);
+    }
+
+  // Create order with embedded snapshot
+    const order = new Order({
+      date: date || new Date(),
+      product: {  // ← Embed snapshot of selected Product
+        productCode: product.productCode,
+        name: product.name,
+        price: product.price,  // Locks in price at order time
+        category: product.category
+      },
+      size,
+      quantity
+    });
+    
+    const savedOrder = await order.save();
+    return savedOrder;
+
+  } catch (error) {
+    console.error('Error adding order:', error);
+    throw error;
+  }
+};
+
+const removeOrder = async (id) => {
+  try {
+    return await Order.findByIdAndDelete(id);
+  } catch (error) {
+    console.error('Error removing order:', error);
+    throw error;
+  }
+};
+
 module.exports = { Order, getOrders, addOrder, removeOrder };

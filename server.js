@@ -5,14 +5,16 @@ const app = express();
 const port = process.env.PORT || 3000;
 const appName = process.env.APPNAME || 'Titan Coffee Shop API';
 
-const apiRoutes = require('./routes/orders'); 
+const apiOrderRoutes = require('./routes/orders'); 
+const apiProductsRoutes = require('./routes/products'); 
 const { connectWithRetry, isConnected } = require('./db/connection');
 
 // Middleware for JSON parsing
 app.use(express.json());
 
 // API routes
-app.use('/api', apiRoutes);
+app.use('/api', apiOrderRoutes);
+app.use('/api', apiProductsRoutes);
 
 // Home - Root route
 app.get('/', (req, res) => {
@@ -26,6 +28,11 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
     database: isConnected() ? 'Connected' : 'Disconnected'
   });
+});
+
+// badmath - route to generate a 500 Error
+app.get('/badmath', (req, res) => {
+  throw('tried to process some bad Math ');
 });
 
 // 404 Error handling

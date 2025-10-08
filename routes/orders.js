@@ -3,43 +3,35 @@ const express = require('express');
 const router = express.Router();
 
 // destructuring assignment: function references from productManager Module - only provide the functions that are needed for the assignment
-const { getProducts, getProductByCode } = require('../productManager');
+const {  getProductByCode } = require('../productManager');
 
 // destructuring assignment: function references from orderManager Module - only provide the functions that are needed for the assignment
 const { getOrders, addOrder, Order } = require('../orderManager');
 
-// GET /api/products - using async
-router.get('/products', async (req, res, next) => {
+// GET /api/orders- using async
+router.get('/orders', async (req, res, next) => {
   try {
-    const products = await getProducts();  // must await the asyncronous call
-    res.json(products);
-  } catch (error) {
-    next(error); // Pass to Express error handler
-  }
-});
-
-// GET /api/orders
-router.get('/orders', (req, res, next) => {
-  try {
-    const orders = getOrders();
+    const orders = await getOrders(); // must await the asyncronous call
     res.json(orders);
   } catch (error) {
     next(error); // Pass to Express error handler
   }
 });
 
-// POST /api/orders - RESTful Add -  Handles single or multiple orders
-router.post('/orders', (req, res, next) => {
+// POST /api/orders -  using async - RESTful Add -  Handles single or multiple orders
+router.post('/orders', async (req, res, next) => {
   try {
     // checks if the POST body is an array, if not, it wraps the body in an array
     const ordersPOSTData = Array.isArray(req.body) ? req.body : [req.body];
 
     // initialize arrays to store results of each order as they are validated
     const invalidOrders = [];
-    const savedOrders = [];
-
-    ordersPOSTData.forEach((orderPOSTData, index) => {
-      const { date, productCode, size, quantity } = orderPOSTData;
+    const savedOrders = [];   
+   
+    
+      // Fill local variables with POST data 
+    for (let i = 0; i < ordersPOSTData.length; i++) {
+      const { date, productCode, size, quantity } = ordersPOSTData[i];
       
       // Use current date if not provided
       const orderDate = date ? new Date(date) : new Date();
@@ -50,34 +42,34 @@ router.post('/orders', (req, res, next) => {
       
       // This is the fix - Thank you Grok!
       if (typeof productCode === 'undefined' || typeof size === 'undefined' || typeof quantity === 'undefined'){
-        invalidOrders.push({ index, error: 'Missing required fields: productCode, size, quantity' });
+        invalidOrders.push({ index: i, error: 'Missing required fields: productCode, size, quantity' });
         return;
       }
       
       // Validate productCode
       const product = getProductByCode(productCode);
       if (!product) {
-        invalidOrders.push({ index, error: `Invalid productCode: ${productCode} not found` });
+        invalidOrders.push({ index: i, error: `Invalid productCode: ${productCode} not found` });
         return;
       }
       
       // Validate size
       if (!['small', 'medium', 'large'].includes(size)) {
-        invalidOrders.push({ index, error: `Invalid size: ${size} must be small, medium, or large` });
+        invalidOrders.push({ index: i, error: `Invalid size: ${size} must be small, medium, or large` });
         return;
       }
 
       // Validate quantity 
       if (!Number.isInteger(quantity) || quantity <= 0) {
-        invalidOrders.push({ index, error: `Invalid quantity: ${quantity} must be a positive integer greater than 0` });
+        invalidOrders.push({ index: i, error: `Invalid quantity: ${quantity} must be a positive integer greater than 0` });
         return;
       }
 
-      // Save valid order
-      const order = addOrder(orderDate, product, size, quantity);
+      // Save valid order -  using aysync
+      const order = await addOrder(orderDate, productCode, size, quantity);
       // Add valid order to the savedOrders status array
       savedOrders.push(order);
-    });
+    }
 
     // Respond based on validation results
     if (invalidOrders.length > 0) {
@@ -98,6 +90,7 @@ router.post('/orders', (req, res, next) => {
     next(error); // Pass to Express error handler
   }
 
+  
 });
 
 module.exports = router;
