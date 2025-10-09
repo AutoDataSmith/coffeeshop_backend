@@ -2,6 +2,9 @@ require('dotenv').config();  // This will Load .env variables into process.env
 
 const express = require('express');
 const app = express();
+
+// Add security packages
+const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
