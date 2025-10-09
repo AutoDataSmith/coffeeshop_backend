@@ -19,7 +19,9 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'"],
-      connectSrc: ["'self'", process.env.FRONTEND_URL || 'https://yourfrontend.com']
+      connectSrc: [
+        "'self'", // Allow same-origin (localhost in dev, Render domain in prod)
+        process.env.FRONTEND_URL || 'https://yourfrontend.com']
     }
   },
   frameguard: { action: 'deny' },
@@ -30,6 +32,18 @@ app.use(helmet({
     preload: true
   }
 }));
+
+// CORS Configuration
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'https://yourfrontend.com',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+if (process.env.NODE_ENV === 'development') {
+  app.use(cors());
+}
 
 // Set up Rate Limiting
 const limiter = rateLimit({
