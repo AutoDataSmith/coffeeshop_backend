@@ -20,3 +20,7 @@ DB_RETRY_DELAY=2000
 # this is the delay in milliseconds between each retry that makes an attempt to connect
 
 ```
+
+## Live Application URL  - Hosted by Render
+
+https://coffeeshop-backend-4qlh.onrender.com

@@ -2,12 +2,44 @@ require('dotenv').config();  // This will Load .env variables into process.env
 
 const express = require('express');
 const app = express();
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+
 const port = process.env.PORT || 3000;
 const appName = process.env.APPNAME || 'Titan Coffee Shop API';
 
 const apiOrderRoutes = require('./routes/orders'); 
 const apiProductsRoutes = require('./routes/products'); 
 const { connectWithRetry, isConnected } = require('./db/connection');
+
+// Security Headers with Helmet
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      connectSrc: ["'self'", process.env.FRONTEND_URL || 'https://yourfrontend.com']
+    }
+  },
+  frameguard: { action: 'deny' },
+  noSniff: true,
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true
+  }
+}));
+
+// Set up Rate Limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Max 100 requests per IP
+  message: 'Too many requests from this IP, please try again after 15 minutes',
+  standardHeaders: true, // Adds rate limit headers (e.g., X-RateLimit-Limit)
+  legacyHeaders: false // Disable older X-RateLimit headers
+});
+app.use(limiter); // Apply to all routes
 
 // Middleware for JSON parsing
 app.use(express.json());
